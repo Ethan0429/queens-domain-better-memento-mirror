@@ -11,11 +11,7 @@ When you walk within about **49 ft** of a hidden ghost the mirror can reveal, th
 - The hint plays only while you carry the Memento Mirror. It only plays for ghosts the mirror would reveal right now; it skips ghosts that are already revealed, have moved on, have been rewarded, or are not yet available in the story.
 - Nothing plays while the game is paused or during cutscenes.
 
-## Turning it on or off
-
-Open **Options → Game** and use the **Memento Mirror Hints** On/Off switch. It works like the game's other options, with the mouse or a controller, from the title screen or in game. Your choice is remembered, and the **Revert to default** button leaves it alone.
-
-The hint starts switched on.
+The hint is always on while the mod is installed; remove the mod to turn it off.
 
 ## Installation
 
@@ -39,15 +35,15 @@ This mod works alongside [Hatchling's Weapon Wheel](https://github.com/Ethan0429
 
 Install [UE4SS](https://github.com/UE4SS-RE/RE-UE4SS/releases/tag/v4.0.0) in `QueensDomain\Binaries\Win64`, with `dwmapi.dll` beside the game executable and the remaining loader files in `ue4ss`. Copy `Mods\HatchlingsBetterMementoMirror` into `ue4ss\Mods`. The included `enabled.txt` enables the mod; no changes to `mods.txt` are needed.
 
-## Settings and logs
+## Logs
 
-The On/Off choice is stored outside your game saves:
+The mod logs to `ue4ss\UE4SS.log` with the prefix `[HatchlingsBetterMementoMirror]`, including each hint with the ghost's name and distance. It also keeps a small snapshot of what it sees (ghosts in the level, the nearest revealable one, the last hint) in:
 
 ```text
-%LOCALAPPDATA%\QueensDomain\Saved\BetterMementoMirror\settings.txt
+%LOCALAPPDATA%\QueensDomain\Saved\BetterMementoMirror\status.txt
 ```
 
-There is no need to edit it; use the in-game option. The same folder holds `status.txt`, a small snapshot of what the mod sees (ghosts in the level, the nearest revealable one, the last hint), and the mod logs to `ue4ss\UE4SS.log` with the prefix `[HatchlingsBetterMementoMirror]`. Both help when reporting a problem.
+Both help when reporting a problem.
 
 ## Artwork
 
@@ -60,4 +56,4 @@ py -3 tools\generate_assets.py
 
 ## Removal
 
-Close the game and delete `ue4ss\Mods\HatchlingsBetterMementoMirror`. Or run `Uninstall.ps1` with the same `-GameDirectory` argument. Saves and settings are retained.
+Close the game and delete `ue4ss\Mods\HatchlingsBetterMementoMirror`. Or run `Uninstall.ps1` with the same `-GameDirectory` argument. Saves are retained.

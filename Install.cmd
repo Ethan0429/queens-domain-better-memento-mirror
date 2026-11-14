@@ -331,7 +331,7 @@ function Invoke-Installation([string]$RequestedDirectory) {
     Write-Host "`nHatchling's Better Memento Mirror was installed successfully."
     Write-Host "Location: $(Join-Path $loaderRoot 'Mods\HatchlingsBetterMementoMirror')"
     if ($script:BackupDirectory) { Write-Host "Previous files were backed up to $script:BackupDirectory" }
-    Write-Host 'Start the game. Turn the effect on or off in Options > Game > Memento Mirror Hints.'
+    Write-Host 'Start the game. Carry the Memento Mirror and it will hint when a hidden ghost is near.'
 }
 
 function Wait-ForInstallerExit {

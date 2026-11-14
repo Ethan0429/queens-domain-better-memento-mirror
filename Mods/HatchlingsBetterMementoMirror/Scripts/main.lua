@@ -2,12 +2,10 @@ local source=debug.getinfo(1,'S').source:gsub('^@',''):gsub('\\','/')
 local ROOT=assert(source:match('^(.*)/Scripts/main.lua$'),'Cannot locate mod folder')
 local Proximity=dofile(ROOT..'/Scripts/proximity.lua')
 local Shimmer=dofile(ROOT..'/Scripts/shimmer.lua')
-local Options=dofile(ROOT..'/Scripts/options.lua')
 local UE=require('UEHelpers')
 local VERSION='0.1.0'
 local TAG='[HatchlingsBetterMementoMirror] '
 local DATA=(os.getenv('LOCALAPPDATA') or '.')..'/QueensDomain/Saved/BetterMementoMirror/'
-local SETTINGS=DATA..'settings.txt'
 
 -- Tuning. Distances are in Unreal units (centimeters).
 local RADIUS=1500             -- about 49 ft: the mirror's own reveal range, so every hint is actionable
@@ -16,7 +14,6 @@ local BACKOFF=5               -- seconds of quiet after the sound and shimmer fi
 local VOLUME=.3               -- the real mirror plays at 1.0
 local SCAN_TICKS=15           -- distance checks every ~0.25 s
 local REFRESH_TICKS=120       -- re-list the level's ghosts every ~2 s
-local OPTIONS_TICKS=30        -- look for an open Options > Game list every ~0.5 s
 
 local GHOST_CLASS='NPC_Ghost_Base_C'
 local MIRROR_ITEM='/Game/Items/Consumables/MementoMirror/MementoMirror.MementoMirror'
@@ -30,23 +27,8 @@ local function valid(o) return o~=nil and o:IsValid() end
 local warned={}
 local function warnOnce(key,msg) if not warned[key] then warned[key]=true;log(msg) end end
 
-local function readEnabled()
-    local f=io.open(SETTINGS,'rb')
-    if not f then return true end
-    local text=f:read('a');f:close()
-    return not text:find('hints_enabled%s*=%s*0')
-end
-local function writeEnabled(value)
-    local f=io.open(SETTINGS..'.tmp','wb')
-    if not f then warnOnce('save','Could not save settings to '..SETTINGS);return end
-    f:write('-- Managed by the mod. Change it in Options > Game > Memento Mirror Hints.\nhints_enabled='..(value and 1 or 0)..'\n')
-    f:close();os.remove(SETTINGS);os.rename(SETTINGS..'.tmp',SETTINGS)
-end
-
-local enabled=readEnabled()
 local proximity=Proximity.new(BACKOFF)
 local shimmer=Shimmer.new(ROOT)
-local options=Options.new('Memento Mirror Hints',log)
 local frame,world,ghosts,ghostsAt=0,nil,{},-math.huge
 local lastError,lastStatus,lastHint=nil,'',nil
 
@@ -156,17 +138,9 @@ local function scan(c,now)
     if id then playHint(c,now,first[id][1],first[id][2]) end
 end
 
-local function setEnabled(value)
-    enabled=value
-    writeEnabled(value)
-    options:sync(value)
-    if not value then shimmer:stop();proximity:reset() end
-    log('Hints turned '..(value and 'on' or 'off'))
-end
-
 local function status(c)
-    local line=string.format('enabled=%s\nowns_mirror=%s\nworld=%s\nghosts=%d\nnearest_revealable=%s\nlast_hint=%s\nerror=%s\n',
-        tostring(enabled),tostring(c and ownsMirror(c) or false),world or '',#ghosts,
+    local line=string.format('owns_mirror=%s\nworld=%s\nghosts=%d\nnearest_revealable=%s\nlast_hint=%s\nerror=%s\n',
+        tostring(c and ownsMirror(c) or false),world or '',#ghosts,
         nearest and string.format('%.0f',nearest) or '',lastHint or '',lastError or '')
     if line~=lastStatus then
         local f=io.open(DATA..'status.txt','wb');if f then f:write(line);f:close() end
@@ -176,9 +150,6 @@ end
 
 local function tick()
     frame=frame+1
-    if frame%OPTIONS_TICKS==1 then options:scan(UE.GetPlayerController()) end
-    local flipped=options:update(enabled)
-    if flipped~=nil then setEnabled(flipped) end
     local c=context()
     if not c then shimmer:stop();return end
     local now=realTime(c)
@@ -186,14 +157,12 @@ local function tick()
     if c.world~=world then
         world=c.world;proximity:reset();shimmer:stop();ghosts={};ghostsAt=-math.huge
     end
-    if enabled then
-        if frame-ghostsAt>=REFRESH_TICKS then
-            local before=#ghosts
-            ghosts=FindAllOf(GHOST_CLASS) or {};ghostsAt=frame
-            if #ghosts~=before then log('Ghosts in '..world..': '..#ghosts) end
-        end
-        if frame%SCAN_TICKS==0 and not busy(c) then scan(c,now) end
+    if frame-ghostsAt>=REFRESH_TICKS then
+        local before=#ghosts
+        ghosts=FindAllOf(GHOST_CLASS) or {};ghostsAt=frame
+        if #ghosts~=before then log('Ghosts in '..world..': '..#ghosts) end
     end
+    if frame%SCAN_TICKS==0 and not busy(c) then scan(c,now) end
     if frame%60==0 then status(c) end
 end
 
@@ -210,4 +179,4 @@ LoopAsync(16,function()
     if not queued then queued=true;ExecuteInGameThread(function() protectedTick();queued=false end) end
     return false
 end)
-log('Loaded v'..VERSION..'. Hints are '..(enabled and 'on' or 'off')..'; change them in Options > Game > Memento Mirror Hints.')
+log('Loaded v'..VERSION..'.')
