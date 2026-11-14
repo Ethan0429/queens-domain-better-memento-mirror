@@ -1,0 +1,28 @@
+param([Parameter(Mandatory=$true)][string]$GameDirectory)
+$ErrorActionPreference = 'Stop'
+if (Get-Process -Name 'QueensDomain-Win64-Shipping' -ErrorAction SilentlyContinue) {
+    throw 'Close Queen''s Domain before uninstalling.'
+}
+$chosen = (Resolve-Path -LiteralPath $GameDirectory).Path
+$runtime = if (Test-Path -LiteralPath (Join-Path $chosen 'QueensDomain-Win64-Shipping.exe')) {
+    $chosen
+} else { Join-Path $chosen 'QueensDomain\Binaries\Win64' }
+$runtime = (Resolve-Path -LiteralPath $runtime).Path
+$loaderRoot = if (Test-Path -LiteralPath (Join-Path $runtime 'ue4ss\UE4SS.dll')) {
+    Join-Path $runtime 'ue4ss'
+} elseif (Test-Path -LiteralPath (Join-Path $runtime 'UE4SS.dll')) {
+    $runtime
+} else { throw 'UE4SS was not found in this game installation.' }
+$modRoot = (Resolve-Path -LiteralPath (Join-Path $loaderRoot 'Mods')).Path
+foreach ($name in @('HatchlingsBetterMementoMirror')) {
+    $target = Join-Path $modRoot $name
+    if (!(Test-Path -LiteralPath $target)) { continue }
+    $resolved = (Resolve-Path -LiteralPath $target).Path
+    $expected = [IO.Path]::GetFullPath((Join-Path $modRoot $name))
+    if (![string]::Equals($resolved,$expected,[StringComparison]::OrdinalIgnoreCase)) {
+        throw 'Unexpected mod path; no files were removed.'
+    }
+    if (![IO.Path]::GetFileName($resolved).Equals($name)) { throw 'Unexpected directory name.' }
+    Remove-Item -LiteralPath $resolved -Recurse -Force
+}
+Write-Output 'Removed Hatchling's Better Memento Mirror. Other mods, configuration, and saves were retained.'
