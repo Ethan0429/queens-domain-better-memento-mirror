@@ -2,11 +2,11 @@
 
 A proximity hint for the Memento Mirror in Queen's Domain.
 
-When you walk within about **20 ft** of a hidden ghost the mirror can reveal, the mirror's use sound plays faintly and a slight spectral shimmer runs around the edge of the screen. Then use the mirror to reveal the ghost.
+When you walk within about **49 ft** of a hidden ghost the mirror can reveal, the mirror's use sound plays faintly and a slight spectral shimmer runs around the edge of the screen. That is the mirror's own reach, so using it right away reveals the ghost.
 
 ## How it behaves
 
-- The hint plays once when you come within range of a ghost. Standing near it does not repeat the hint. Walk away (about 25 ft) and come back to hear it again.
+- The hint plays once when you come within range of a ghost. Standing near it does not repeat the hint. Walk away (about 62 ft) and come back to hear it again.
 - After a hint, the sound and shimmer finish and there are **5 seconds** of quiet before another hint can play. If you reached a ghost during that time, its hint plays once the wait is over.
 - The hint plays only while you carry the Memento Mirror. It only plays for ghosts the mirror would reveal right now; it skips ghosts that are already revealed, have moved on, have been rewarded, or are not yet available in the story.
 - Nothing plays while the game is paused or during cutscenes.

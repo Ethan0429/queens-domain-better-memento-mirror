@@ -10,7 +10,7 @@ local DATA=(os.getenv('LOCALAPPDATA') or '.')..'/QueensDomain/Saved/BetterMement
 local SETTINGS=DATA..'settings.txt'
 
 -- Tuning. Distances are in Unreal units (centimeters).
-local RADIUS=610              -- about 20 ft; the mirror itself reaches 1500 (about 49 ft)
+local RADIUS=1500             -- about 49 ft: the mirror's own reveal range, so every hint is actionable
 local RELEASE=RADIUS*1.25     -- walk this far from a ghost before it can hint again
 local BACKOFF=5               -- seconds of quiet after the sound and shimmer finish
 local VOLUME=.3               -- the real mirror plays at 1.0
